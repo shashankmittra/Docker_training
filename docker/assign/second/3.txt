@@ -1,0 +1,9 @@
+created a private repo and pushed the image created using dockerfile into it - 
+docker service create  --name registry --publish 5000:5000 registry:latest
+docker tag second localhost:5000/my-sec
+sudo docker push localhost:5000/my-sec
+
+to create the service of the tagged image -
+docker service create --name helloworld <name of the tagged image> sh -c "while true; do echo Hello; sleep 2; done"
+to scale it  - 
+docker service scale helloworld=5

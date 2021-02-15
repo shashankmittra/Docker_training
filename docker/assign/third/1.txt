@@ -1,0 +1,21 @@
+to create a user defined bridge network - $docker network create alpine-net
+
+to create 4 alpine containers - 
+alpine 1, 2,4 - user defined network
+alpine 3,4 - default bridge network
+commands - 
+	$ docker run -dit --name alpine1 --network alpine-net alpine ash
+
+	$ docker run -dit --name alpine2 --network alpine-net alpine ash
+
+	$ docker run -dit --name alpine3 alpine ash
+
+	$ docker run -dit --name alpine4 --network alpine-net alpine ash
+
+	$ docker network connect bridge alpine4
+
+can ping alpine 1,2 from alpine 4 using container names and ip add as well - $docker container attach alpine1
+can ping alpine 3 from alpine 4 using ip add only
+cannot ping alpine 3 from alpine 1, 2 with container names and ip add as well
+
+to inspect a network - $docker inspect alpine-net

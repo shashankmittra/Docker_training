@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  phpmyadmin:
+    image: phpmyadmin
+    depends_on:
+      - db
+    profiles:
+      - debug
+
+  db:
+    image: mysql

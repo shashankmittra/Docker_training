@@ -1,0 +1,45 @@
+services:
+  nodejs:
+    container_name: nodejs # How the container will appear when listing containers from the CLI
+    build:
+      context: .
+      dockerfile: Dockerfile-nodejs
+    user: node # The user to run as in the container
+    working_dir: "/app" # Where to container will assume it should run commands and where you will start out if you go inside the container
+    networks:
+      - app # Networking can get complex, but for all intents and purposes just know that containers on the same network can speak to each other
+    ports:
+      - "3000:3000" # <host-port>:<container-port> to listen to, so anything running on port 3000 of the container will map to port 3000 on our localhost
+    volumes:
+      - ./:/app # <host-directory>:<container-directory> this says map the current directory from your system to the /app directory in the docker container
+    command: # The command docker will execute when starting the container, this command is not allowed to exit, if it does your container will stop
+      - mongodb:27017
+      - --
+      - /bin/sh
+      - -c
+      - npm install && npm start
+    env_file: .env
+    environment: 
+      - MONGO_USERNAME=$MONGO_USERNAME
+      - MONGO_PASSWORD=$MONGO_PASSWORD
+      - MONGO_HOSTNAME=mongodb
+      - MONGO_PORT=$MONGO_PORT
+      - MONGO_DB=$MONGO_DB
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:4.1.8-xenial
+    container_name: mongodb
+    restart: always
+    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGO_PASSWORD
+      - MONGO_INITDB_DATABASE=$MONGO_DB
+    networks: 
+      - app
+
+networks:
+  app:
+    driver: bridge

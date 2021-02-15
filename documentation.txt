@@ -1,0 +1,75 @@
+Bridge network - 
+docker network create my-net
+docker network rm my-net
+to connect it - docker create --name my-nginx \
+  --network my-net \
+  --publish 8080:80 \
+  nginx:latest
+  
+to connenct to an existing container- docker network connect my-net my-nginx
+docker network disconnect my-net my-nginx
+
+Overlay n/w
+for swarm -docker network create -d overlay my-overlay
+for both swarm and standalone - docker network create -d overlay --attachable my-attachable-overlay
+to check for ingress n/w - docker network inspect ingress
+This example sets the MTU to 1200, sets the subnet to 10.11.0.0/16, and sets the gateway to 10.11.0.2. - 
+docker network create \
+  --driver overlay \
+  --ingress \
+  --subnet=10.11.0.0/16 \
+  --gateway=10.11.0.2 \
+  --opt com.docker.network.driver.mtu=1200 \
+  my-ingress
+  
+  Macvlan -
+  When you create a macvlan network, it can either be in bridge mode or 802.1q trunk bridge mode.
+
+    In bridge mode, macvlan traffic goes through a physical device on the host.
+
+    In 802.1q trunk bridge mode, traffic goes through an 802.1q sub-interface which Docker creates on the fly. This allows you to control routing and filtering at a more granular level.
+    
+    to create mcvaln in bridge mode - docker network create -d macvlan \
+  --subnet=172.16.86.0/24 \
+  --gateway=172.16.86.1 \
+  -o parent=eth0 pub_net
+  
+  in 802.1q - 
+  f you specify a parent interface name with a dot included, such as eth0.50, Docker interprets that as a sub-interface of eth0 and creates the sub-interface automatically.
+
+
+priority of env variables in docker compose - 
+
+    Compose file
+    Shell environment variables
+    Environment file
+    Dockerfile
+    Variable is not defined
+
+SWARM-
+ swarm consists of multiple Docker hosts which run in swarm mode and act as managers (to manage membership and delegation) and workers (which run swarm services). A given Docker host can be a manager, a worker, or perform both roles. 
+ When you create a service, you define its optimal state (number of replicas, network and storage resources available to it, ports the service exposes to the outside world, and more).
+ One of the key advantages of swarm services over standalone containers is that you can modify a service’s configuration, including the networks and volumes it is connected to, without the need to manually restart the service.
+ Node- A node is an instance of the Docker engine participating in the swarm
+
+to make manager node - docker swarm init --advertise-addr <MANAGER-IP> 
+to inspect a node - docker node inspect self --pretty
+to chang eavibility - docker node update --availability drain node-1
+to make worker - manager - docker node update --availability drain node-1
+to leave swarm - docker swarm leave and then from manager node - docker node rm node-2
+
+Secrets - In terms of Docker Swarm services, a secret is a blob of data, such as a password, SSH private key, SSL certificate, or another piece of data that should not be transmitted over a network or stored unencrypted in a Dockerfile or in your application’s source code.	
+When you add a secret to the swarm, Docker sends the secret to the swarm manager over a mutual TLS connection. The secret is stored in the Raft log, which is encrypted
+
+To create a secret - printf "This is a secret" | docker secret create my_secret_data -
+docker service  create --name redis --secret my_secret_data redis:alpine
+docker container exec $(docker ps --filter name=redis -q) cat /run/secrets/my_secret_data
+
+
+docker stack - 
+docker service create --name registry --publish published=5000,target=5000 registry:2
+docker-compose up -d
+docker-compose down --volumes
+docker-compose push
+docker stack deploy --compose-file docker-compose.yml stackdemo
+

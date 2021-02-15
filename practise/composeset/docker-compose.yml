@@ -1,0 +1,29 @@
+services:
+  web:
+    extends:
+      file: common-services.yml
+      service: webapp
+    volumes:
+      - .:/code
+    environment:
+      FLASK_ENV: development
+
+
+  redis:
+    image: "redis:alpine"
+    
+  phpmyadmin:
+    image: phpmyadmin
+    depends_on:
+      - db
+    profiles:
+      - debug
+
+  db:
+    image: mysql
+
+networks:
+  default:
+    external:
+      name: alpine-net
+

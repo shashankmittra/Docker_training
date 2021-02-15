@@ -1,0 +1,19 @@
+This is for 2nd question of week 3 assignment - 
+
+Creating my registry - 
+docker compose file - 
+	services:
+	  registry:
+	    image: registry:2
+	    ports:
+	    - "5000:5000"
+	    
+docker-compose up -d
+
+to push an image - 
+docker pull alpine
+docker tag alpine localhost:5000/my-alpine
+docker push localhost:5000/my-alpine
+
+to pull the image - 
+docker pull localhost:5000/my-alpine

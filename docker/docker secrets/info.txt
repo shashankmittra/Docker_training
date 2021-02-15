@@ -1,0 +1,5 @@
+printf "This is a secret" | docker secret create my_secret_data -
+docker service  create --name redis --secret my_secret_data redis:alpine
+docker container exec $(docker ps --filter name=redis -q) cat /run/secrets/my_secret_data
+
+to remove the access to secret docker service update --secret-rm my_secret_data redis 
